@@ -20,7 +20,7 @@ export async function fetchRevenue() {
     // Don't do this in production :)
 
     console.log('Fetching revenue data...');
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    //await new Promise((resolve) => setTimeout(resolve, 3000)); //to simulate that the query takes 3 seconds to complete
 
     const data = await sql<Revenue>`SELECT * FROM revenue`;
 
@@ -36,7 +36,7 @@ export async function fetchRevenue() {
 export async function fetchLatestInvoices() {
   noStore();
   try {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    // await new Promise((resolve) => setTimeout(resolve, 5000)); //to simulate that the query takes 5 seconds to complete
     const data = await sql<LatestInvoiceRaw>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
       FROM invoices
@@ -67,7 +67,7 @@ export async function fetchCardData() {
          SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // await new Promise((resolve) => setTimeout(resolve, 2000)); //to simulate that the query takes 2 seconds to complete
     const data = await Promise.all([
       invoiceCountPromise,
       customerCountPromise,
@@ -98,7 +98,7 @@ export async function fetchFilteredInvoices(
 ) {
   noStore();
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-  
+
   try {
     const invoices = await sql<InvoicesTable>`
       SELECT
