@@ -10,22 +10,22 @@ import { AuthError } from 'next-auth';
 
 const FormSchema = z.object({
   id: z.string(),
-  customerId: z.string({invalid_type_error: 'Please select a customer.'}),
-  amount: z.coerce.number().gt(0,{message: 'Please enter a valid amount.'}),
-  status: z.enum(['paid', 'pending'],{invalid_type_error: 'Please select a status.'}),
+  customerId: z.string({ invalid_type_error: 'Please select a customer.' }),
+  amount: z.coerce.number().gt(0, { message: 'Please enter a valid amount.' }),
+  status: z.enum(['paid', 'pending'], {
+    invalid_type_error: 'Please select a status.',
+  }),
   date: z.string(),
 });
-
-
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 
 export type State = {
-  errors?:{customerId?:string[];amount?:string[];status?:string[];};
-  message?:string| null;
+  errors?: { customerId?: string[]; amount?: string[]; status?: string[] };
+  message?: string | null;
 };
 
-export async function createInvoice(prevState: State,formData: FormData) {
+export async function createInvoice(prevState: State, formData: FormData) {
   const validateFields = CreateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
@@ -33,10 +33,10 @@ export async function createInvoice(prevState: State,formData: FormData) {
   });
 
   if (!validateFields.success) {
-   return {
-    errors: validateFields.error.flatten().fieldErrors,
-    message: 'Missing fields: Failed to create invoice.',
-   };
+    return {
+      errors: validateFields.error.flatten().fieldErrors,
+      message: 'Missing fields: Failed to create invoice.',
+    };
   }
   const { customerId, amount, status } = CreateInvoice.parse({
     customerId: formData.get('customerId'),
@@ -63,9 +63,11 @@ const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
 // ...
 
-
-export async function updateInvoice(id: string,prevState:State, formData: FormData) {
-
+export async function updateInvoice(
+  id: string,
+  prevState: State,
+  formData: FormData,
+) {
   const validateFields = UpdateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
@@ -97,7 +99,6 @@ export async function updateInvoice(id: string,prevState:State, formData: FormDa
 }
 
 export async function deleteInvoice(id: string) {
- 
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
     revalidatePath('/dashboard/invoices');
@@ -105,7 +106,6 @@ export async function deleteInvoice(id: string) {
     return { message: 'Database error: Failed to delete invoice.' };
   }
 }
-
 
 export async function authenticate(
   prevState: string | undefined,
